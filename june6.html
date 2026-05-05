@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wonder Years Rock Concert — June 6 RSVP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- ================================================================
+       ⚙️  CONFIGURATION — only these 3 lines differ between the two files
+       ================================================================ -->
+  <script>
+    const EVENT_DATE   = 'june6';
+    const DISPLAY_DATE = 'Friday, June 6, 2026';
+    const DISPLAY_DAY  = 'June 6';
+
+    // ✏️ Paste your deployed Apps Script web app URL here (same URL in both files)
+    const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+
+    const FOOD_CAP = 4;
+    const FOOD_CATEGORIES = ['Main dish','Side dish','Appetizer / Snack','Dessert','Drinks'];
+    const OPTED_OUT = 'We will not be partaking in the food — not bringing anything';
+  </script>
+
+  <style>
+    :root {
+      --purple:       #4e1564;
+      --purple-dark:  #360d46;
+      --purple-mid:   #7b2d9a;
+      --orange:       #ff7a1a;
+      --orange-dark:  #c94e00;
+      --yellow:       #ffd400;
+      --navy:         #1a1247;
+      --cream:        #fff8e8;
+      --gray:         #f4f1f8;
+      --muted:        #7a6e8a;
+      --white:        #ffffff;
+      --green:        #00c2a8;
+      --red-light:    #fce4ec;
+      --red-text:     #c62828;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--purple-dark);
+      min-height: 100vh;
+      color: var(--navy);
+    }
+
+    /* ── Background decorative notes ── */
+    .page-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .music-note {
+      position: absolute;
+      color: rgba(255, 212, 0, 0.10);
+      font-size: 3rem;
+      animation: floatNote 18s infinite ease-in-out;
+    }
+    @keyframes floatNote {
+      0%, 100% { transform: translateY(0) rotate(-5deg); }
+      50%       { transform: translateY(-35px) rotate(6deg); }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(150deg, #ffd400 0%, #ff7a1a 55%, #c94e00 100%);
+      padding: 2.5rem 1.5rem 4.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Wave cutout at bottom of hero */
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0; right: 0;
+      height: 48px;
+      background: var(--purple-dark);
+      clip-path: ellipse(54% 100% at 50% 100%);
+    }
+    /* Subtle shimmer overlay */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 70% 30%, rgba(255,255,255,0.15) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .studio-name {
+      font-family: 'Bagel Fat One', cursive;
+      font-size: clamp(1.7rem, 5vw, 2.6rem);
+      color: var(--purple);
+      text-shadow: 3px 3px 0 rgba(255,255,255,0.25);
+      line-height: 1;
+      position: relative;
+    }
+    .concert-title {
+      font-family: 'Bagel Fat One', cursive;
+      font-size: clamp(1.1rem, 3.5vw, 1.55rem);
+      color: var(--white);
+      text-shadow: 2px 2px 0 rgba(78,21,100,0.45);
+      margin-top: 0.35rem;
+      letter-spacing: 0.04em;
+      position: relative;
+    }
+    /* ✏️ Update tagline once chosen */
+    .tagline {
+      color: var(--purple-dark);
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-top: 0.6rem;
+      opacity: 0.8;
+      position: relative;
+      letter-spacing: 0.03em;
+    }
+
+    .chips {
+      display: flex;
+      gap: 0.55rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1.4rem;
+      position: relative;
+    }
+    .chip {
+      background: var(--purple);
+      color: var(--yellow);
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 100px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .chip-link { text-decoration: none; transition: opacity 0.15s; }
+    .chip-link:hover { opacity: 0.82; }
+
+    /* ── WIZARD WRAPPER ── */
+    .wizard-wrap {
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 1.75rem 1.1rem 4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Step indicator */
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .step-dot {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.4);
+      font-weight: 900;
+      font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+    .step-dot.active { background: var(--orange); color: white; box-shadow: 0 0 0 3px rgba(255,122,26,0.35); }
+    .step-dot.done   { background: var(--yellow); color: var(--purple); }
+    .step-line {
+      flex: 1; height: 2px;
+      background: rgba(255,255,255,0.12);
+      max-width: 64px;
+      transition: background 0.3s;
+    }
+    .step-line.done { background: var(--yellow); }
+
+    /* Cards */
+    .card {
+      background: var(--white);
+      border-radius: 22px;
+      padding: 1.75rem 1.5rem;
+      box-shadow: 0 8px 36px rgba(0,0,0,0.28);
+      animation: slideUp 0.32s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-heading {
+      font-family: 'Bagel Fat One', cursive;
+      font-size: 1.55rem;
+      color: var(--purple);
+      line-height: 1.1;
+    }
+    .card-sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 0.3rem;
+      margin-bottom: 1.4rem;
+    }
+
+    /* Form elements */
+    .field { margin-bottom: 1rem; }
+    .field label {
+      display: block;
+      font-weight: 800;
+      font-size: 0.8rem;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.38rem;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 0.8rem 0.95rem;
+      border: 2px solid #ddd6e8;
+      border-radius: 11px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--navy);
+      background: var(--gray);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(255,122,26,0.15);
+      background: white;
+    }
+    /* Custom select arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 1rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      font-size: 0.9rem;
+    }
+
+    /* Cover note banner */
+    .cover-note {
+      background: linear-gradient(135deg, #fff8e1, #fff0c4);
+      border-left: 4px solid var(--orange);
+      border-radius: 10px;
+      padding: 0.7rem 0.95rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #6b3600;
+      margin-bottom: 1.4rem;
+      line-height: 1.4;
+    }
+
+    /* Guest rows */
+    .guest-list { display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 0.7rem; }
+    .guest-row { display: flex; align-items: center; gap: 0.5rem; }
+    .guest-row input { flex: 1; margin: 0; }
+    .remove-guest {
+      background: none; border: none;
+      color: var(--muted); cursor: pointer;
+      font-size: 1.3rem; line-height: 1;
+      padding: 0.2rem 0.3rem;
+      border-radius: 6px;
+      transition: color 0.1s;
+      flex-shrink: 0;
+    }
+    .remove-guest:hover { color: #e53935; }
+
+    .add-guest-btn {
+      width: 100%; padding: 0.7rem;
+      background: none;
+      border: 2px dashed #ccc4d8;
+      border-radius: 11px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800; font-size: 0.95rem;
+      color: var(--purple-mid);
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 1rem;
+    }
+    .add-guest-btn:hover { border-color: var(--orange); color: var(--orange); }
+    /* Inline validation errors */
+    .field-error {
+      display: none;
+      color: #c62828;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-top: 0.38rem;
+      padding: 0.3rem 0.6rem;
+      background: #fce4ec;
+      border-radius: 7px;
+    }
+
+    /* Divider */
+    .divider { border: none; border-top: 2px solid #ece8f3; margin: 1.25rem 0; }
+
+    /* ── FOOD TALLY ── */
+    .tally-label {
+      font-weight: 800; font-size: 0.8rem;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--muted); margin-bottom: 0.75rem;
+    }
+    .tally-grid { display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 1.4rem; }
+
+    .tally-row {
+      background: var(--gray);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+    }
+    .tally-row.cat-full { opacity: 0.65; }
+
+    .tally-top {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
+    }
+    .tally-cat-name { font-weight: 800; font-size: 0.92rem; color: var(--navy); }
+    .tally-badge {
+      font-size: 0.72rem; font-weight: 800;
+      padding: 0.18rem 0.6rem;
+      border-radius: 100px;
+      background: var(--yellow);
+      color: var(--purple);
+      white-space: nowrap;
+    }
+    .tally-badge.full { background: var(--red-light); color: var(--red-text); }
+
+    .tally-claims {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .tally-claim-item { display: inline; }
+    .claim-name { color: var(--purple-mid); }
+
+    .tally-empty { font-style: italic; opacity: 0.55; }
+
+    .tally-loading {
+      text-align: center; padding: 1.25rem;
+      color: var(--muted); font-size: 0.9rem; font-weight: 600;
+    }
+
+    /* ── REVIEW ── */
+    .review-section { margin-bottom: 1.1rem; }
+    .review-label {
+      font-size: 0.75rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--muted); margin-bottom: 0.35rem;
+    }
+    .review-value { font-weight: 700; font-size: 0.98rem; color: var(--navy); }
+    .review-value.dim { color: var(--muted); font-size: 0.88rem; margin-top: 0.1rem; }
+
+    .guest-pill {
+      display: inline-block;
+      background: var(--gray); border-radius: 100px;
+      padding: 0.28rem 0.7rem;
+      font-size: 0.85rem; font-weight: 700;
+      margin: 0.2rem 0.2rem 0 0;
+      color: var(--navy);
+    }
+
+    .total-bar {
+      background: linear-gradient(135deg, var(--purple), var(--purple-mid));
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.25rem;
+      color: white;
+    }
+    .total-bar-left label { font-size: 0.8rem; opacity: 0.75; font-weight: 700; }
+    .total-bar-left p { font-size: 0.78rem; opacity: 0.6; margin-top: 0.1rem; font-weight: 600; }
+    .total-bar-right {
+      font-family: 'Bagel Fat One', cursive;
+      font-size: 1.55rem;
+      color: var(--yellow);
+    }
+
+    .food-tag {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      background: #fff3e0; color: #7a3b00;
+      border-radius: 100px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.9rem; font-weight: 800;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-row {
+      display: flex; gap: 0.7rem;
+      margin-top: 1.4rem;
+    }
+    .btn-back {
+      padding: 0.85rem 1.1rem;
+      background: var(--gray); border: none;
+      border-radius: 12px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800; font-size: 0.95rem;
+      color: var(--muted); cursor: pointer;
+      transition: all 0.15s; flex-shrink: 0;
+    }
+    .btn-back:hover { background: #e6e0f0; color: var(--purple); }
+
+    .btn-next {
+      flex: 1; padding: 0.9rem;
+      background: var(--orange); border: none;
+      border-radius: 12px;
+      font-family: 'Bagel Fat One', cursive;
+      font-size: 1.15rem; color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--orange-dark);
+      transition: transform 0.1s, box-shadow 0.1s;
+      letter-spacing: 0.02em;
+    }
+    .btn-next:hover  { transform: translateY(1px); box-shadow: 0 3px 0 var(--orange-dark); }
+    .btn-next:active { transform: translateY(4px); box-shadow: 0 0 0 var(--orange-dark); }
+    .btn-next:disabled { background: #bbb; box-shadow: 0 4px 0 #999; cursor: default; }
+
+    .btn-submit {
+      flex: 1; padding: 0.95rem;
+      background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+      border: none; border-radius: 12px;
+      font-family: 'Bagel Fat One', cursive;
+      font-size: 1.15rem; color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #7a2d00;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-submit:hover  { transform: translateY(1px); box-shadow: 0 3px 0 #7a2d00; }
+    .btn-submit:active { transform: translateY(4px); box-shadow: 0 0 0 #7a2d00; }
+
+    /* ── SUCCESS ── */
+    .success-wrap {
+      text-align: center;
+      padding: 2.5rem 1.25rem;
+    }
+    .success-emoji {
+      display: block; font-size: 4.5rem;
+      margin-bottom: 1rem;
+      animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .success-title {
+      font-family: 'Bagel Fat One', cursive;
+      font-size: 2rem; color: var(--purple);
+      margin-bottom: 0.5rem;
+    }
+    .success-msg {
+      color: var(--muted); font-size: 0.97rem;
+      font-weight: 600; line-height: 1.5;
+      max-width: 380px; margin: 0 auto 1.5rem;
+    }
+    .success-detail {
+      background: var(--gray);
+      border-radius: 14px;
+      padding: 1rem 1.1rem;
+      text-align: left;
+    }
+    .success-row {
+      display: flex; align-items: flex-start;
+      gap: 0.5rem; padding: 0.4rem 0;
+      font-size: 0.9rem; font-weight: 700;
+      color: var(--navy);
+      border-bottom: 1px solid #ece8f3;
+    }
+    .success-row:last-child { border-bottom: none; }
+    .success-row span:first-child {
+      color: var(--muted); min-width: 72px;
+      font-size: 0.8rem; text-transform: uppercase;
+      letter-spacing: 0.05em; padding-top: 0.05rem;
+    }
+
+    /* Visibility */
+    .step { display: none; }
+    .step.active { display: block; }
+
+    @media (max-width: 460px) {
+      .card { padding: 1.4rem 1rem; }
+      .btn-row { flex-direction: column; }
+      .btn-back { order: 2; text-align: center; }
+    }
+
+    /* Food entry cards */
+    .food-entry {
+      background: var(--gray); border-radius: 14px;
+      padding: 1rem 1rem 0.5rem; margin-bottom: 0.65rem;
+      border: 2px solid #e4ddf0;
+    }
+    .food-entry-header {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 0.65rem;
+    }
+    .food-entry-label {
+      font-weight: 800; font-size: 0.78rem;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--purple-mid);
+    }
+    .remove-food-btn {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 0.82rem; font-weight: 700;
+      padding: 0.2rem 0.5rem; border-radius: 6px; transition: all 0.12s;
+    }
+    .remove-food-btn:hover { background: #fce4ec; color: #c62828; }
+    .food-entry .field { margin-bottom: 0.65rem; }
+    .food-entry .field input, .food-entry .field select { background: white; }
+    .opted-out-note {
+      font-weight: 700; font-size: 0.9rem;
+      color: var(--purple-mid); padding: 0.2rem 0 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background notes -->
+<div class="page-bg" aria-hidden="true">
+  <span class="music-note" style="top:6%;left:3%;animation-delay:0s">♪</span>
+  <span class="music-note" style="top:20%;right:5%;animation-delay:3.5s">♫</span>
+  <span class="music-note" style="top:48%;left:5%;animation-delay:7s">♩</span>
+  <span class="music-note" style="top:70%;right:3%;animation-delay:2s">♬</span>
+  <span class="music-note" style="top:88%;left:45%;animation-delay:5s">♪</span>
+</div>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<header class="hero">
+  <div class="studio-name">Wonder Years Music Studio</div>
+  <div class="concert-title">🎸 Rock Band Concert Night</div>
+  <div class="tagline">Plug in. Turn up. Rock out.</div>
+  <div class="chips">
+    <span class="chip">📅 <span id="hero-date">June 6</span></span>
+    <span class="chip">⏰ 4:00 PM – 8:00 PM</span>
+    <!-- ✏️ Add full studio address below -->
+    <a href="https://maps.google.com/?q=10+East+Wilmot+St+Unit+4,+Richmond+Hill,+ON" target="_blank" class="chip chip-link">📍 10 East Wilmot St, Unit 4, Richmond Hill</a>
+  </div>
+</header>
+
+<!-- ═══════════════════ WIZARD ═══════════════════ -->
+<div class="wizard-wrap">
+
+  <!-- Step indicator (hidden on step 4) -->
+  <div class="step-indicator" id="step-indicator">
+    <div class="step-dot active" id="dot1">1</div>
+    <div class="step-line" id="line12"></div>
+    <div class="step-dot" id="dot2">2</div>
+    <div class="step-line" id="line23"></div>
+    <div class="step-dot" id="dot3">3</div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 1 · Who's Coming
+       ───────────────────────────────────────── -->
+  <div class="step active" id="step1">
+    <div class="card">
+      <div class="card-heading">Who's coming? 🎟️</div>
+      <div class="card-sub">We'll use this to track numbers for the night.</div>
+
+      <div class="cover-note">
+        🎵 $5 per guest — please arrange payment with Jennifer
+        at least 1 week before the concert.<br>
+        Please list every person attending so we have an accurate count.
+      </div>
+
+      <div class="field">
+        <label for="main-name">Your full name</label>
+        <input id="main-name" type="text" placeholder="Jane Smith" autocomplete="name">
+        <div class="field-error" id="err-name">⚠️ Please enter your name.</div>
+      </div>
+      <div class="field">
+        <label for="main-email">Your email</label>
+        <input id="main-email" type="email" placeholder="you@email.com" autocomplete="email">
+        <div class="field-error" id="err-email">⚠️ Please enter a valid email address.</div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="field">
+        <label>Additional guests
+          <span style="font-weight:600;text-transform:none;font-size:0.88em;color:#aaa"> — full name required for each</span>
+        </label>
+        <div class="guest-list" id="guest-list"></div>
+        <button type="button" class="add-guest-btn" id="add-guest-btn">
+          + Add another guest
+        </button>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-next" id="btn1-next">Food sign-up →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 2 · Food Tally + Selection
+       ───────────────────────────────────────── -->
+  <div class="step" id="step2">
+    <div class="card">
+      <div class="card-heading">Potluck Sign-Up 🍽️</div>
+      <div class="card-sub">See what's already claimed for this night, then add yours.</div>
+
+      <div class="tally-label">What's already spoken for — <span id="tally-night">June 6</span></div>
+      <div class="tally-grid" id="tally-grid">
+        <div class="tally-loading">Checking the menu… 🎶</div>
+      </div>
+
+      <hr class="divider">
+
+      <div id="food-entries"></div>
+
+      <button type="button" class="add-guest-btn" id="add-food-btn" style="margin-bottom:0.9rem">
+        + Bring something else
+      </button>
+      <div class="field-error" id="err-food-global" style="margin-bottom:0.75rem">
+        ⚠️ Please complete your food selection.
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" id="btn2-back">← Back</button>
+        <button class="btn-next" id="btn2-next">Review →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 3 · Review
+       ───────────────────────────────────────── -->
+  <div class="step" id="step3">
+    <div class="card">
+      <div class="card-heading">Review & confirm ✅</div>
+      <div class="card-sub">Everything look right? Hit confirm to lock it in.</div>
+
+      <div class="review-section">
+        <div class="review-label">Your info</div>
+        <div class="review-value" id="rev-name">—</div>
+        <div class="review-value dim" id="rev-email">—</div>
+      </div>
+
+      <div class="review-section" id="rev-extras-wrap" style="display:none">
+        <div class="review-label">Additional guests</div>
+        <div id="rev-extras"></div>
+      </div>
+
+      <div class="total-bar">
+        <div class="total-bar-left">
+          <label>Total guests</label>
+          <p>× $5 each — pay Jennifer 1 wk before</p>
+        </div>
+        <div class="total-bar-right" id="rev-total">—</div>
+      </div>
+
+      <div class="review-section">
+        <div class="review-label">📅 Night</div>
+        <div class="review-value" id="rev-date">—</div>
+        <div class="review-value dim">4:00 PM – 8:00 PM</div>
+      </div>
+
+      <div class="review-section">
+        <div class="review-label">🍽️ You're bringing</div>
+        <div id="rev-food">—</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" id="btn3-back">← Back</button>
+        <button class="btn-submit" id="btn-submit">🎸 Count me in!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 4 · Success
+       ───────────────────────────────────────── -->
+  <div class="step" id="step4">
+    <div class="card">
+      <div class="success-wrap">
+        <span class="success-emoji">🎸</span>
+        <div class="success-title">You're on the list!</div>
+        <p class="success-msg">
+          We can't wait to see you. Here's your confirmed booking for <strong id="succ-night">—</strong>:
+        </p>
+        <div class="success-detail">
+          <div class="success-row">
+            <span>Night</span><span id="succ-date">—</span>
+          </div>
+          <div class="success-row">
+            <span>Time</span><span>4:00 PM – 8:00 PM</span>
+          </div>
+          <div class="success-row">
+            <span>Guests</span><span id="succ-guests">—</span>
+          </div>
+          <div class="success-row">
+            <span>Cover</span><span id="succ-cover">—</span>
+          </div>
+          <div class="success-row">
+            <span>Bringing</span><span id="succ-food">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wizard-wrap -->
+
+
+<script>
+/* ── Boot: apply config ── */
+document.getElementById('hero-date').textContent  = DISPLAY_DAY;
+document.getElementById('tally-night').textContent = DISPLAY_DAY;
+document.title = `Wonder Years Rock Concert — ${DISPLAY_DAY} RSVP`;
+
+/* ══════════════════════════════════════════
+   STEP MANAGEMENT
+   ══════════════════════════════════════════ */
+function showStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+
+  const indicator = document.getElementById('step-indicator');
+  indicator.style.display = n === 4 ? 'none' : 'flex';
+
+  [1, 2, 3].forEach(i => {
+    const dot = document.getElementById('dot' + i);
+    dot.classList.remove('active', 'done');
+    if (i < n)        { dot.classList.add('done'); dot.textContent = '✓'; }
+    else if (i === n) { dot.classList.add('active'); dot.textContent = i; }
+    else              { dot.textContent = i; }
+  });
+  document.getElementById('line12').classList.toggle('done', n > 1);
+  document.getElementById('line23').classList.toggle('done', n > 2);
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════════
+   STEP 1 — Guest collection
+   ══════════════════════════════════════════ */
+const guestListEl = document.getElementById('guest-list');
+
+document.getElementById('add-guest-btn').addEventListener('click', () => {
+  const idx = guestListEl.children.length + 1;
+  const row = document.createElement('div');
+  row.className = 'guest-row';
+  row.innerHTML = `
+    <input type="text" placeholder="Guest ${idx} — full name" class="extra-guest">
+    <button type="button" class="remove-guest" title="Remove guest" aria-label="Remove guest">×</button>`;
+  row.querySelector('.remove-guest').addEventListener('click', () => row.remove());
+  guestListEl.appendChild(row);
+  row.querySelector('input').focus();
+});
+
+document.getElementById('btn1-next').addEventListener('click', () => {
+  const name  = document.getElementById('main-name').value.trim();
+  const email = document.getElementById('main-email').value.trim();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const errName  = document.getElementById('err-name');
+  const errEmail = document.getElementById('err-email');
+  errName.style.display  = !name    ? 'block' : 'none';
+  errEmail.style.display = !emailOk ? 'block' : 'none';
+  if (!name || !emailOk) return;
+  loadTallyThenStep2();
+});
+
+/* ══════════════════════════════════════════
+   STEP 2 — Food tally + selection
+   ══════════════════════════════════════════ */
+let tallyData = [];
+
+function loadTallyThenStep2() {
+  showStep(2);
+  const grid = document.getElementById('tally-grid');
+  grid.innerHTML = '<div class="tally-loading">Checking the menu… 🎶</div>';
+
+  fetch(`${SCRIPT_URL}?action=tally&date=${EVENT_DATE}`)
+    .then(r => { if (!r.ok) throw new Error('Network error'); return r.json(); })
+    .then(data => {
+      tallyData = data;
+      renderTally(data);
+      document.getElementById('food-entries').innerHTML = '';
+      addFoodEntry();
+    })
+    .catch(() => {
+      // First run or network issue — show empty categories
+      const empty = FOOD_CATEGORIES.map(c => ({
+        category: c, claims: [], remaining: FOOD_CAP
+      }));
+      tallyData = empty;
+      renderTally(empty);
+      document.getElementById('food-entries').innerHTML = '';
+      addFoodEntry();
+    });
+}
+
+function renderTally(data) {
+  const grid = document.getElementById('tally-grid');
+  if (!data || !data.length) {
+    grid.innerHTML = '<div class="tally-loading">Nothing claimed yet — be the first! 🙌</div>';
+    return;
+  }
+  grid.innerHTML = data.map(row => {
+    const full = row.remaining === 0;
+    let claimsHtml;
+    if (row.claims && row.claims.length) {
+      claimsHtml = row.claims
+        .map(c => `<span class="claim-name">${c.name}</span> — ${c.item}`)
+        .join(' &nbsp;·&nbsp; ');
+    } else {
+      claimsHtml = '<span class="tally-empty">Nothing yet — it\'s yours to claim!</span>';
+    }
+    return `
+      <div class="tally-row${full ? ' cat-full' : ''}">
+        <div class="tally-top">
+          <span class="tally-cat-name">${row.category}</span>
+          <span class="tally-badge${full ? ' full' : ''}">
+            ${full ? 'FULL' : `${row.remaining} spot${row.remaining !== 1 ? 's' : ''} left`}
+          </span>
+        </div>
+        <div class="tally-claims">${claimsHtml}</div>
+      </div>`;
+  }).join('');
+}
+
+document.getElementById('btn2-back').addEventListener('click', () => showStep(1));
+
+/* ── Food entry builder ── */
+function addFoodEntry() {
+  const container = document.getElementById('food-entries');
+  const idx = container.children.length;
+  const entry = document.createElement('div');
+  entry.className = 'food-entry';
+  entry.innerHTML = `
+    <div class="food-entry-header">
+      <span class="food-entry-label">${idx === 0 ? "You're bringing:" : "Also bringing:"}</span>
+      <button type="button" class="remove-food-btn" style="${idx === 0 ? 'display:none' : ''}">× Remove</button>
+    </div>
+    <div class="field">
+      <div class="select-wrap">
+        <select class="food-cat-sel">
+          <option value="">— Choose a category —</option>
+        </select>
+      </div>
+      <div class="field-error entry-err-cat">⚠️ Please choose a category.</div>
+    </div>
+    <div class="food-item-field">
+      <div class="field">
+        <input type="text" class="food-item-inp" placeholder="e.g. Homemade mac & cheese (nut-free)">
+        <div class="field-error entry-err-item">⚠️ Please describe what you're bringing.</div>
+      </div>
+    </div>
+    <div class="opted-out-note" style="display:none">✅ Got it! Changed your mind? Just pick a different category above.</div>
+  `;
+  container.appendChild(entry);
+  fillCategorySelect(entry.querySelector('.food-cat-sel'));
+  entry.querySelector('.food-cat-sel').addEventListener('change', function () {
+    handleCatChange(entry, this.value);
+  });
+  entry.querySelector('.remove-food-btn').addEventListener('click', () => {
+    entry.remove();
+    refreshEntryLabels();
+  });
+  refreshEntryLabels();
+}
+
+function fillCategorySelect(sel) {
+  sel.innerHTML = '<option value="">— Choose a category —</option>';
+  if (tallyData && tallyData.length) {
+    tallyData.filter(r => r.remaining > 0).forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r.category;
+      opt.textContent = r.category + '  (' + r.remaining + ' spot' + (r.remaining !== 1 ? 's' : '') + ' left)';
+      sel.appendChild(opt);
+    });
+  } else {
+    FOOD_CATEGORIES.forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat; opt.textContent = cat;
+      sel.appendChild(opt);
+    });
+  }
+  const sep = document.createElement('option');
+  sep.disabled = true; sep.textContent = '──────────────────────';
+  sel.appendChild(sep);
+  const noFood = document.createElement('option');
+  noFood.value = OPTED_OUT;
+  noFood.textContent = 'We will not be partaking in the food — not bringing anything';
+  sel.appendChild(noFood);
+}
+
+function handleCatChange(entry, val) {
+  const itemField  = entry.querySelector('.food-item-field');
+  const optedNote  = entry.querySelector('.opted-out-note');
+  const addFoodBtn = document.getElementById('add-food-btn');
+  const container  = document.getElementById('food-entries');
+  if (val === OPTED_OUT) {
+    itemField.style.display = 'none';
+    optedNote.style.display = 'block';
+    [...container.children].forEach(e => { if (e !== entry) e.remove(); });
+    addFoodBtn.style.display = 'none';
+  } else {
+    itemField.style.display = '';
+    optedNote.style.display = 'none';
+    addFoodBtn.style.display = '';
+  }
+  refreshEntryLabels();
+}
+
+function refreshEntryLabels() {
+  const entries = document.querySelectorAll('.food-entry');
+  entries.forEach((e, i) => {
+    const lbl = e.querySelector('.food-entry-label');
+    if (lbl) lbl.textContent = i === 0 ? "You're bringing:" : 'Also bringing:';
+    const rm = e.querySelector('.remove-food-btn');
+    if (rm) rm.style.display = entries.length === 1 ? 'none' : '';
+  });
+}
+
+function collectFoods() {
+  return [...document.querySelectorAll('.food-entry')].map(e => ({
+    category: e.querySelector('.food-cat-sel').value,
+    item:     e.querySelector('.food-item-inp').value.trim()
+  }));
+}
+
+document.getElementById('add-food-btn').addEventListener('click', addFoodEntry);
+
+document.getElementById('btn2-next').addEventListener('click', () => {
+  const entries = [...document.querySelectorAll('.food-entry')];
+  let valid = true;
+  entries.forEach(entry => {
+    const cat     = entry.querySelector('.food-cat-sel').value;
+    const item    = entry.querySelector('.food-item-inp').value.trim();
+    const optedOut = cat === OPTED_OUT;
+    entry.querySelector('.entry-err-cat').style.display  = !cat             ? 'block' : 'none';
+    entry.querySelector('.entry-err-item').style.display = (!item && !optedOut) ? 'block' : 'none';
+    if (!cat || (!item && !optedOut)) valid = false;
+  });
+  document.getElementById('err-food-global').style.display = valid ? 'none' : 'block';
+  if (!valid) return;
+  entries.forEach(entry => {
+    if (entry.querySelector('.food-cat-sel').value === OPTED_OUT)
+      entry.querySelector('.food-item-inp').value = '—';
+  });
+  buildReview();
+  showStep(3);
+});
+
+/* ══ STEP 3 — Review ══ */
+function buildReview() {
+  const name   = document.getElementById('main-name').value.trim();
+  const email  = document.getElementById('main-email').value.trim();
+  const extras = [...document.querySelectorAll('.extra-guest')].map(i => i.value.trim()).filter(Boolean);
+  const total  = 1 + extras.length;
+  const foods  = collectFoods();
+  const optedOut = foods.length === 1 && foods[0].category === OPTED_OUT;
+  document.getElementById('rev-name').textContent  = name;
+  document.getElementById('rev-email').textContent = email;
+  document.getElementById('rev-date').textContent  = DISPLAY_DATE;
+  document.getElementById('rev-total').textContent = total + ' guest' + (total !== 1 ? 's' : '');
+  const extrasWrap = document.getElementById('rev-extras-wrap');
+  const extrasDiv  = document.getElementById('rev-extras');
+  if (extras.length) {
+    extrasWrap.style.display = '';
+    extrasDiv.innerHTML = extras.map(g => '<span class="guest-pill">👤 ' + g + '</span>').join('');
+  } else {
+    extrasWrap.style.display = 'none';
+  }
+  const foodHtml = optedOut
+    ? '<span class="food-tag" style="background:#f3f0fa;color:#7a6e8a">🙅 Not bringing food</span>'
+    : foods.map(f => '<span class="food-tag" style="display:inline-flex;margin:0.2rem 0">🍽️ ' + f.category + ' — ' + f.item + '</span>').join('<br>');
+  document.getElementById('rev-food').innerHTML = foodHtml;
+}
+
+document.getElementById('btn3-back').addEventListener('click', () => showStep(2));
+
+/* ══ STEP 4 — Submit ══ */
+document.getElementById('btn-submit').addEventListener('click', async () => {
+  const btn    = document.getElementById('btn-submit');
+  const name   = document.getElementById('main-name').value.trim();
+  const email  = document.getElementById('main-email').value.trim();
+  const extras = [...document.querySelectorAll('.extra-guest')].map(i => i.value.trim()).filter(Boolean);
+  const total  = 1 + extras.length;
+  const foods  = collectFoods();
+  const optedOut = foods.length === 1 && foods[0].category === OPTED_OUT;
+  btn.textContent = '✨ Sending…';
+  btn.disabled = true;
+  const payload = {
+    action: 'rsvp', date: EVENT_DATE, displayDate: DISPLAY_DATE,
+    name, email, guests: extras, totalCount: total,
+    foods: optedOut ? [{category: 'Not bringing food', item: '—'}] : foods
+  };
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify(payload)
+    });
+  } catch {
+    btn.textContent = '😬 Something went wrong — try again';
+    btn.disabled = false;
+    return;
+  }
+  const guestSummary = extras.length ? name + ' + ' + extras.join(', ') : name;
+  const foodSummary  = optedOut ? 'Not bringing food'
+    : foods.map(f => f.category + ': ' + f.item).join(' · ');
+  document.getElementById('succ-night').textContent  = DISPLAY_DAY;
+  document.getElementById('succ-date').textContent   = DISPLAY_DATE;
+  document.getElementById('succ-guests').textContent = guestSummary;
+  document.getElementById('succ-cover').textContent  = total + ' × $5 — please pay Jennifer 1 week before the concert';
+  document.getElementById('succ-food').textContent   = foodSummary;
+  showStep(4);
+});
+});
+</script>
+</body>
+</html>
