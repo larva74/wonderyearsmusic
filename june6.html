@@ -745,16 +745,27 @@ function showStep(n) {
    ══════════════════════════════════════════ */
 const guestListEl = document.getElementById('guest-list');
 
-document.getElementById('add-guest-btn').addEventListener('click', () => {
-  const idx = guestListEl.children.length + 1;
-  const row = document.createElement('div');
+document.getElementById('add-guest-btn').addEventListener('click', function() {
+  var idx = guestListEl.children.length + 1;
+  var row = document.createElement('div');
   row.className = 'guest-row';
-  row.innerHTML = `
-    <input type="text" placeholder="Guest ${idx} — full name" class="extra-guest">
-    <button type="button" class="remove-guest" title="Remove guest" aria-label="Remove guest">×</button>`;
-  row.querySelector('.remove-guest').addEventListener('click', () => row.remove());
+
+  var inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'extra-guest';
+  inp.placeholder = 'Guest ' + idx + ' — full name';
+
+  var rmBtn = document.createElement('button');
+  rmBtn.type = 'button';
+  rmBtn.className = 'remove-guest';
+  rmBtn.title = 'Remove guest';
+  rmBtn.innerHTML = '&times;';
+  rmBtn.addEventListener('click', function() { row.remove(); });
+
+  row.appendChild(inp);
+  row.appendChild(rmBtn);
   guestListEl.appendChild(row);
-  row.querySelector('input').focus();
+  try { inp.focus(); } catch(e) {}
 });
 
 document.getElementById('btn1-next').addEventListener('click', () => {
@@ -776,26 +787,40 @@ let tallyData = [];
 
 function loadTallyThenStep2() {
   showStep(2);
-  const grid = document.getElementById('tally-grid');
-  grid.innerHTML = '<div class="tally-loading">Checking the menu… 🎶</div>';
+  var grid = document.getElementById('tally-grid');
+  grid.innerHTML = '<div class="tally-loading">Checking the menu...</div>';
 
-  fetch(`${SCRIPT_URL}?action=tally&date=${EVENT_DATE}`)
-    .then(r => { if (!r.ok) throw new Error('Network error'); return r.json(); })
-    .then(data => {
-      tallyData = data;
-      renderTally(data);
-      document.getElementById('food-entries').innerHTML = '';
-      addFoodEntry();
-    })
-    .catch(() => {
-      // First run or network issue — show empty categories
-      const empty = FOOD_CATEGORIES.map(c => ({
-        category: c, claims: [], remaining: FOOD_CAP
+  // Show food form immediately — do not wait for the network
+  document.getElementById('food-entries').innerHTML = '';
+  addFoodEntry();
+
+  // Fetch tally in background; update dropdown + display when ready
+  var settled = false;
+  function applyTally(data) {
+    if (settled) return;
+    settled = true;
+    tallyData = data;
+    renderTally(data);
+    document.querySelectorAll('.food-cat-sel').forEach(function(sel) {
+      fillCategorySelect(sel);
+    });
+  }
+
+  // Safety timeout — if network never responds, show empty categories
+  var timer = setTimeout(function() {
+    applyTally(FOOD_CATEGORIES.map(function(c) {
+      return { category: c, claims: [], remaining: FOOD_CAP };
+    }));
+  }, 5000);
+
+  fetch(SCRIPT_URL + '?action=tally&date=' + EVENT_DATE)
+    .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+    .then(function(data) { clearTimeout(timer); applyTally(data); })
+    .catch(function() {
+      clearTimeout(timer);
+      applyTally(FOOD_CATEGORIES.map(function(c) {
+        return { category: c, claims: [], remaining: FOOD_CAP };
       }));
-      tallyData = empty;
-      renderTally(empty);
-      document.getElementById('food-entries').innerHTML = '';
-      addFoodEntry();
     });
 }
 
@@ -832,43 +857,46 @@ document.getElementById('btn2-back').addEventListener('click', () => showStep(1)
 
 /* ── Food entry builder ── */
 function addFoodEntry() {
-  const container = document.getElementById('food-entries');
-  const idx = container.children.length;
-  const entry = document.createElement('div');
+  var container = document.getElementById('food-entries');
+  var idx = container.children.length;
+  var entry = document.createElement('div');
   entry.className = 'food-entry';
-  entry.innerHTML = `
-    <div class="food-entry-header">
-      <span class="food-entry-label">${idx === 0 ? "You're bringing:" : "Also bringing:"}</span>
-      <button type="button" class="remove-food-btn" style="${idx === 0 ? 'display:none' : ''}">× Remove</button>
-    </div>
-    <div class="field">
-      <div class="select-wrap">
-        <select class="food-cat-sel">
-          <option value="">— Choose a category —</option>
-        </select>
-      </div>
-      <div class="field-error entry-err-cat">⚠️ Please choose a category.</div>
-    </div>
-    <div class="food-item-field">
-      <div class="field">
-        <input type="text" class="food-item-inp" placeholder="e.g. Homemade mac & cheese (nut-free)">
-        <div class="field-error entry-err-item">⚠️ Please describe what you're bringing.</div>
-      </div>
-    </div>
-    <div class="opted-out-note" style="display:none">✅ Got it! Changed your mind? Just pick a different category above.</div>
-  `;
+
+  // Build HTML without template literals to avoid any browser parsing quirks
+  entry.innerHTML =
+    '<div class="food-entry-header">' +
+      '<span class="food-entry-label">' + (idx === 0 ? "You're bringing:" : 'Also bringing:') + '</span>' +
+      '<button type="button" class="remove-food-btn">&times; Remove</button>' +
+    '</div>' +
+    '<div class="field">' +
+      '<div class="select-wrap">' +
+        '<select class="food-cat-sel"><option value="">Choose a category...</option></select>' +
+      '</div>' +
+      '<div class="field-error entry-err-cat">Please choose a category.</div>' +
+    '</div>' +
+    '<div class="food-item-field">' +
+      '<div class="field">' +
+        '<input type="text" class="food-item-inp" placeholder="What are you bringing?">' +
+        '<div class="field-error entry-err-item">Please describe what you're bringing.</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="opted-out-note" style="display:none">Got it! Changed your mind? Just pick a different category above.</div>';
+
+  var removeBtn = entry.querySelector('.remove-food-btn');
+  removeBtn.style.display = idx === 0 ? 'none' : '';
+
   container.appendChild(entry);
   fillCategorySelect(entry.querySelector('.food-cat-sel'));
-  entry.querySelector('.food-cat-sel').addEventListener('change', function () {
+
+  entry.querySelector('.food-cat-sel').addEventListener('change', function() {
     handleCatChange(entry, this.value);
   });
-  entry.querySelector('.remove-food-btn').addEventListener('click', () => {
+  removeBtn.addEventListener('click', function() {
     entry.remove();
     refreshEntryLabels();
   });
   refreshEntryLabels();
 }
-
 function fillCategorySelect(sel) {
   sel.innerHTML = '<option value="">— Choose a category —</option>';
   if (tallyData && tallyData.length) {
