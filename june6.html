@@ -17,11 +17,19 @@
     const DISPLAY_DAY  = 'June 6';
 
     // ✏️ Paste your deployed Apps Script web app URL here (same URL in both files)
-    const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykNqhhj_-pY9R0ZvMH6qE3FHcyTl5PqIQkKkQgY7oD2_e8KH-5DgFUiIYJ2vH3W3ygrQ/exec';
 
     const FOOD_CAP = 4;
     const FOOD_CATEGORIES = ['Main dish','Side dish','Appetizer / Snack','Dessert','Drinks'];
     const OPTED_OUT = 'We will not be partaking in the food — not bringing anything';
+
+    const BANDS = [
+      "Rockin' Rovers",
+      "Gnarly Styx",
+      "High Spirit",
+      'S-Class "The Muffins"',
+      "Mellow Tones"
+    ];
   </script>
 
   <style>
@@ -318,6 +326,10 @@
     }
     .remove-guest:hover { color: #e53935; }
 
+    .helper-note {
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--muted); margin-top: 0.38rem; font-style: italic;
+    }
     .add-guest-btn {
       width: 100%; padding: 0.7rem;
       background: none;
@@ -699,6 +711,15 @@
         <div class="field-error" id="err-email">⚠️ Please enter a valid email address.</div>
       </div>
 
+      <div class="field">
+        <label for="band-sel">Which band are you here to support?</label>
+        <div class="select-wrap">
+          <select id="band-sel"><option value="">— Choose a band —</option></select>
+        </div>
+        <div class="field-error" id="err-band">⚠️ Please choose a band.</div>
+        <div class="helper-note">🎸 In two bands? Just pick their first one — the owner knows their students.</div>
+      </div>
+
       <hr class="divider">
 
       <div class="field">
@@ -762,6 +783,11 @@
         <div class="review-value dim" id="rev-email">—</div>
       </div>
 
+      <div class="review-section">
+        <div class="review-label">🎸 Band</div>
+        <div class="review-value" id="rev-band">—</div>
+      </div>
+
       <div class="review-section" id="rev-extras-wrap" style="display:none">
         <div class="review-label">Additional guests</div>
         <div id="rev-extras"></div>
@@ -809,6 +835,9 @@
             <span>Night</span><span id="succ-date">—</span>
           </div>
           <div class="success-row">
+            <span>Band</span><span id="succ-band">—</span>
+          </div>
+          <div class="success-row">
             <span>Time</span><span>4:00 PM – 8:00 PM</span>
           </div>
           <div class="success-row">
@@ -831,6 +860,12 @@
 <script>
 /* ── Boot: apply config ── */
 document.getElementById('hero-date').textContent  = DISPLAY_DAY;
+var bandSel = document.getElementById('band-sel');
+BANDS.forEach(function(b) {
+  var opt = document.createElement('option');
+  opt.value = b; opt.textContent = b;
+  bandSel.appendChild(opt);
+});
 document.getElementById('tally-night').textContent = DISPLAY_DAY;
 document.title = `Wonder Years Rock Concert — ${DISPLAY_DAY} RSVP`;
 
@@ -889,11 +924,14 @@ document.getElementById('btn1-next').addEventListener('click', () => {
   const name  = document.getElementById('main-name').value.trim();
   const email = document.getElementById('main-email').value.trim();
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const band    = document.getElementById('band-sel').value;
   const errName  = document.getElementById('err-name');
   const errEmail = document.getElementById('err-email');
+  const errBand  = document.getElementById('err-band');
   errName.style.display  = !name    ? 'block' : 'none';
   errEmail.style.display = !emailOk ? 'block' : 'none';
-  if (!name || !emailOk) return;
+  errBand.style.display  = !band    ? 'block' : 'none';
+  if (!name || !emailOk || !band) return;
   loadTallyThenStep2();
 });
 
@@ -1105,7 +1143,9 @@ function buildReview() {
   const total  = 1 + extras.length;
   const foods  = collectFoods();
   const optedOut = foods.length === 1 && foods[0].category === OPTED_OUT;
+  const band = document.getElementById('band-sel').value;
   document.getElementById('rev-name').textContent  = name;
+  document.getElementById('rev-band').textContent  = band;
   document.getElementById('rev-email').textContent = email;
   document.getElementById('rev-date').textContent  = DISPLAY_DATE;
   document.getElementById('rev-total').textContent = total + ' guest' + (total !== 1 ? 's' : '');
@@ -1138,6 +1178,7 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
   btn.disabled = true;
   const payload = {
     action: 'rsvp', date: EVENT_DATE, displayDate: DISPLAY_DATE,
+    band: document.getElementById('band-sel').value,
     name, email, guests: extras, totalCount: total,
     foods: optedOut ? [{category: 'Not bringing food', item: '—'}] : foods
   };
@@ -1156,6 +1197,7 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
   const foodSummary  = optedOut ? 'Not bringing food'
     : foods.map(f => f.category + ': ' + f.item).join(' · ');
   document.getElementById('succ-night').textContent  = DISPLAY_DAY;
+  document.getElementById('succ-band').textContent   = document.getElementById('band-sel').value;
   document.getElementById('succ-date').textContent   = DISPLAY_DATE;
   document.getElementById('succ-guests').textContent = guestSummary;
   document.getElementById('succ-cover').textContent  = total + ' × $5 — please pay Jennifer 1 week before the concert';
