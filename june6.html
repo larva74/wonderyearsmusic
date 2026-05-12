@@ -17,7 +17,7 @@
     const DISPLAY_DAY  = 'June 6';
 
     // ✏️ Paste your deployed Apps Script web app URL here (same URL in both files)
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxqby2L7M7diVjEH--szAr09nY7cFYeaE2WFgJkiYLncgFxWTCQ9DmKARyjZf59hhUn2w/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyv6hYEXTN62chbX38-aOU04xzEoV7xlPul4NTeap4EaV_Z2c6sXBArEq_-VcY56o3Egw/exec';
 
     const FOOD_CAP = 5;
     const FOOD_CATEGORIES = ['Main dish','Side dish','Appetizer / Snack','Dessert','Drinks','Other'];
@@ -573,6 +573,16 @@
       font-weight: 700; font-size: 0.9rem;
       color: var(--purple-mid); padding: 0.2rem 0 0.5rem;
     }
+
+    /* Edit banner */
+    #edit-banner {
+      display: none;
+      padding: 12px 18px; border-radius: 12px;
+      color: white; font-weight: 700;
+      text-align: center; margin-bottom: 1.2rem;
+      font-size: 0.95rem; line-height: 1.4;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
@@ -948,6 +958,7 @@ function loadTallyThenStep2() {
   // Show food form immediately — do not wait for the network
   document.getElementById('food-entries').innerHTML = '';
   addFoodEntry();
+  applyPrefilledFoodsIfAny();
 
   // Fetch tally in background; update dropdown + display when ready
   var settled = false;
@@ -1204,6 +1215,106 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
   document.getElementById('succ-food').textContent   = foodSummary;
   showStep(4);
 });
+
+// ════════════════════════════════════════════════
+//  PRE-FILL FROM URL (edit-existing-RSVP flow)
+// ════════════════════════════════════════════════
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var qEmail = (params.get('email') || '').trim();
+  if (!qEmail || !qEmail.includes('@')) return;
+
+  var emailInp = document.getElementById('main-email');
+  emailInp.value = qEmail;
+  emailInp.readOnly = true;
+  emailInp.style.opacity = '0.7';
+  emailInp.style.cursor = 'not-allowed';
+
+  showEditBanner('Looking up your existing RSVP...', '#7a6e8a');
+
+  fetch(SCRIPT_URL + '?action=lookup&email=' + encodeURIComponent(qEmail) + '&date=' + EVENT_DATE)
+    .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+    .then(function(data) {
+      if (data && data.found) {
+        prefillFromExisting(data);
+        showEditBanner("✏️ Editing your registration — make changes below and resubmit.", '#ff7a1a');
+      } else {
+        showEditBanner("No existing registration found for that email — fill in your details below.", '#7a6e8a');
+        emailInp.readOnly = false;
+        emailInp.style.opacity = '';
+        emailInp.style.cursor = '';
+      }
+    })
+    .catch(function() {
+      hideEditBanner();
+      emailInp.readOnly = false;
+      emailInp.style.opacity = '';
+      emailInp.style.cursor = '';
+    });
+})();
+
+function showEditBanner(text, color) {
+  var banner = document.getElementById('edit-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'edit-banner';
+    var step1 = document.getElementById('step1');
+    var card = step1.querySelector('.card');
+    step1.insertBefore(banner, card);
+  }
+  banner.style.background = color;
+  banner.textContent = text;
+  banner.style.display = 'block';
+}
+function hideEditBanner() {
+  var b = document.getElementById('edit-banner');
+  if (b) b.style.display = 'none';
+}
+
+function prefillFromExisting(data) {
+  document.getElementById('main-name').value = data.name || '';
+  document.getElementById('band-sel').value = data.band || '';
+
+  var guestList = document.getElementById('guest-list');
+  guestList.innerHTML = '';
+  (data.guests || []).forEach(function(g) {
+    document.getElementById('add-guest-btn').click();
+    var inputs = guestList.querySelectorAll('.extra-guest');
+    inputs[inputs.length - 1].value = g;
+  });
+
+  window.__prefilledFoods    = data.foods || [];
+  window.__prefilledOptedOut = !!data.optedOut;
+}
+
+function applyPrefilledFoodsIfAny() {
+  if (window.__prefilledOptedOut) {
+    var entry = document.querySelector('.food-entry');
+    if (entry) {
+      entry.querySelector('.food-cat-sel').value = OPTED_OUT;
+      handleCatChange(entry, OPTED_OUT);
+    }
+    window.__prefilledOptedOut = false;
+    return;
+  }
+  if (!window.__prefilledFoods || !window.__prefilledFoods.length) return;
+  var foods = window.__prefilledFoods;
+  window.__prefilledFoods = null;
+
+  document.getElementById('food-entries').innerHTML = '';
+  foods.forEach(function(food, idx) {
+    if (idx === 0) {
+      addFoodEntry();
+    } else {
+      document.getElementById('add-food-btn').click();
+    }
+    var entries = document.querySelectorAll('.food-entry');
+    var entry = entries[entries.length - 1];
+    entry.querySelector('.food-cat-sel').value = food.category;
+    entry.querySelector('.food-item-inp').value = food.item;
+  });
+}
+
 </script>
 </body>
 </html>
