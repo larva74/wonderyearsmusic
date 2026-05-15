@@ -15,6 +15,7 @@
     const EVENT_DATE   = 'june6';
     const DISPLAY_DATE = 'Saturday, June 6, 2026';
     const DISPLAY_DAY  = 'June 6';
+    const PAYMENT_DEADLINE = 'May 30, 2026';
 
     // ✏️ Paste your deployed Apps Script web app URL here (same URL in both files)
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyv6hYEXTN62chbX38-aOU04xzEoV7xlPul4NTeap4EaV_Z2c6sXBArEq_-VcY56o3Egw/exec';
@@ -314,10 +315,70 @@
       line-height: 1.4;
     }
 
+
+    /* Field grid - aligns Performer column across name + guest rows */
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 90px 30px;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .field-grid.header {
+      margin-bottom: 0.45rem;
+      align-items: end;
+    }
+    .field-grid.header label {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0;
+    }
+    .field-grid.header label.perf-head {
+      text-align: center;
+      color: var(--purple);
+    }
+    .checkbox-cell {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .perf-cb {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      border: 2.5px solid var(--purple);
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      margin: 0;
+      position: relative;
+      transition: all 0.12s;
+      flex-shrink: 0;
+    }
+    .perf-cb:checked {
+      background: var(--orange);
+      border-color: var(--orange);
+    }
+    .perf-cb:checked::after {
+      content: '✓';
+      color: white;
+      font-weight: 900;
+      font-size: 1.05rem;
+      line-height: 1;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .spacer-cell { visibility: hidden; }
+    
     /* Guest rows */
     .guest-list { display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 0.7rem; }
-    .guest-row { display: flex; align-items: center; gap: 0.5rem; }
-    .guest-row input { flex: 1; margin: 0; }
+    .guest-row { display: grid; grid-template-columns: 1fr 90px 30px; gap: 0.5rem; align-items: center; }
+    .guest-row input { margin: 0; }
     .remove-guest {
       background: none; border: none;
       color: var(--muted); cursor: pointer;
@@ -681,7 +742,7 @@
   <div class="tagline">Plug in. Turn up. Rock out.</div>
   <div class="chips">
     <span class="chip">📅 <span id="hero-date">June 6</span></span>
-    <span class="chip">⏰ 4:00 PM – 8:00 PM</span>
+    <span class="chip">⏰ 5:00 PM – approx. 9:00 PM</span>
     <!-- ✏️ Add full studio address below -->
     <a href="https://maps.google.com/?q=10+East+Wilmot+St+Unit+4,+Richmond+Hill,+ON" target="_blank" class="chip chip-link">📍 10 East Wilmot St, Unit 4, Richmond Hill</a>
   </div>
@@ -708,14 +769,23 @@
       <div class="card-sub">We'll use this to track numbers for the night.</div>
 
       <div class="cover-note">
-        🎵 $5 per guest — please arrange payment with Jennifer
-        at least 1 week before the concert.<br>
-        Please list every person attending so we have an accurate count.
+        🎵 $5 per non-performer guest — please pay Jennifer by May 30, 2026.<br>
+        <strong>Please include band members/performers in your guest list and check the Performer box for each.</strong>
       </div>
 
       <div class="field">
-        <label for="main-name">Your full name</label>
-        <input id="main-name" type="text" placeholder="Jane Smith" autocomplete="name">
+        <div class="field-grid header">
+          <label for="main-name">Your full name</label>
+          <label class="perf-head">Performer</label>
+          <span></span>
+        </div>
+        <div class="field-grid">
+          <input id="main-name" type="text" placeholder="Jane Smith" autocomplete="name">
+          <div class="checkbox-cell">
+            <input type="checkbox" id="main-performer" class="perf-cb" title="Check if you are performing">
+          </div>
+          <span class="spacer-cell">×</span>
+        </div>
         <div class="field-error" id="err-name">⚠️ Please enter your name.</div>
       </div>
       <div class="field">
@@ -730,15 +800,17 @@
           <select id="band-sel"><option value="">— Choose a band —</option></select>
         </div>
         <div class="field-error" id="err-band">⚠️ Please choose a band.</div>
-        <div class="helper-note">🎸 In two bands? Just pick their first one — the owner knows their students.</div>
+        <div class="helper-note">🎸 In two bands? Just pick their first one — Jennifer knows her students.</div>
       </div>
 
       <hr class="divider">
 
       <div class="field">
-        <label>Additional guests
-          <span style="font-weight:600;text-transform:none;font-size:0.88em;color:#aaa"> — full name required for each</span>
-        </label>
+        <div class="field-grid header">
+          <label>Additional guests<span style="font-weight:600;text-transform:none;font-size:0.88em;color:#aaa"> — full name required for each</span></label>
+          <label class="perf-head">Performer</label>
+          <span></span>
+        </div>
         <div class="guest-list" id="guest-list"></div>
         <button type="button" class="add-guest-btn" id="add-guest-btn">
           + Add another guest
@@ -801,6 +873,11 @@
         <div class="review-value" id="rev-band">—</div>
       </div>
 
+      <div class="review-section" id="rev-performers-wrap" style="display:none">
+        <div class="review-label">🎸 Performers (free)</div>
+        <div id="rev-performers"></div>
+      </div>
+
       <div class="review-section" id="rev-extras-wrap" style="display:none">
         <div class="review-label">Additional guests</div>
         <div id="rev-extras"></div>
@@ -808,8 +885,8 @@
 
       <div class="total-bar">
         <div class="total-bar-left">
-          <label>Total guests</label>
-          <p>× $5 each — pay Jennifer 1 wk before</p>
+          <label id="rev-total-label">Total guests</label>
+          <p id="rev-cover-text">× $5 each — pay Jennifer by May 30, 2026</p>
         </div>
         <div class="total-bar-right" id="rev-total">—</div>
       </div>
@@ -817,7 +894,7 @@
       <div class="review-section">
         <div class="review-label">📅 Night</div>
         <div class="review-value" id="rev-date">—</div>
-        <div class="review-value dim">4:00 PM – 8:00 PM</div>
+        <div class="review-value dim">5:00 PM – approx. 9:00 PM</div>
       </div>
 
       <div class="review-section">
@@ -851,7 +928,7 @@
             <span>Band</span><span id="succ-band">—</span>
           </div>
           <div class="success-row">
-            <span>Time</span><span>4:00 PM – 8:00 PM</span>
+            <span>Time</span><span>5:00 PM – approx. 9:00 PM</span>
           </div>
           <div class="success-row">
             <span>Guests</span><span id="succ-guests">—</span>
@@ -920,6 +997,14 @@ document.getElementById('add-guest-btn').addEventListener('click', function() {
   inp.className = 'extra-guest';
   inp.placeholder = 'Guest ' + idx + ' — full name';
 
+  var cbCell = document.createElement('div');
+  cbCell.className = 'checkbox-cell';
+  var cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.className = 'guest-performer-cb perf-cb';
+  cb.title = 'Check if this person is performing';
+  cbCell.appendChild(cb);
+
   var rmBtn = document.createElement('button');
   rmBtn.type = 'button';
   rmBtn.className = 'remove-guest';
@@ -928,6 +1013,7 @@ document.getElementById('add-guest-btn').addEventListener('click', function() {
   rmBtn.addEventListener('click', function() { row.remove(); });
 
   row.appendChild(inp);
+  row.appendChild(cbCell);
   row.appendChild(rmBtn);
   guestListEl.appendChild(row);
   try { inp.focus(); } catch(e) {}
@@ -1150,27 +1236,76 @@ document.getElementById('btn2-next').addEventListener('click', () => {
 });
 
 /* ══ STEP 3 — Review ══ */
+function getMainPerformer() { return document.getElementById('main-performer').checked; }
+
+function getGuestData() {
+  const rows = document.querySelectorAll('.guest-row');
+  const data = [];
+  rows.forEach(row => {
+    const name = row.querySelector('.extra-guest').value.trim();
+    if (!name) return;
+    const isPerformer = !!row.querySelector('.guest-performer-cb').checked;
+    data.push({ name: name, isPerformer: isPerformer });
+  });
+  return data;
+}
+
+function computeTotals() {
+  const guests = getGuestData();
+  const mainPerf = getMainPerformer();
+  const mainName = document.getElementById('main-name').value.trim();
+  const totalGuests = 1 + guests.length;
+  const performers = [];
+  if (mainPerf) performers.push(mainName);
+  guests.forEach(g => { if (g.isPerformer) performers.push(g.name); });
+  const nonPerformerGuests = guests.filter(g => !g.isPerformer).map(g => g.name);
+  const payingCount = totalGuests - performers.length;
+  const amountOwed = Math.max(0, payingCount) * 5;
+  return { guests, mainPerf, mainName, totalGuests, performers, nonPerformerGuests, payingCount, amountOwed };
+}
+
 function buildReview() {
   const name   = document.getElementById('main-name').value.trim();
   const email  = document.getElementById('main-email').value.trim();
-  const extras = [...document.querySelectorAll('.extra-guest')].map(i => i.value.trim()).filter(Boolean);
-  const total  = 1 + extras.length;
+  const t      = computeTotals();
   const foods  = collectFoods();
   const optedOut = foods.length === 1 && foods[0].category === OPTED_OUT;
-  const band = document.getElementById('band-sel').value;
+  const band   = document.getElementById('band-sel').value;
+
   document.getElementById('rev-name').textContent  = name;
   document.getElementById('rev-band').textContent  = band;
   document.getElementById('rev-email').textContent = email;
   document.getElementById('rev-date').textContent  = DISPLAY_DATE;
-  document.getElementById('rev-total').textContent = total + ' guest' + (total !== 1 ? 's' : '');
+
+  // Top-line label + cover text + dollar amount
+  document.getElementById('rev-total-label').textContent =
+    t.totalGuests + ' guest' + (t.totalGuests !== 1 ? 's' : '') +
+    ' · ' + t.performers.length + ' performer' + (t.performers.length !== 1 ? 's' : '') +
+    ' · ' + t.payingCount + ' paying';
+  document.getElementById('rev-cover-text').textContent =
+    t.payingCount + ' × $5 — pay Jennifer by ' + PAYMENT_DEADLINE;
+  document.getElementById('rev-total').textContent = '$' + t.amountOwed;
+
+  // Performers section
+  const perfWrap = document.getElementById('rev-performers-wrap');
+  const perfDiv  = document.getElementById('rev-performers');
+  if (t.performers.length) {
+    perfWrap.style.display = '';
+    perfDiv.innerHTML = t.performers.map(p => '<span class="guest-pill" style="background:#fff0e0;color:#c94e00;">🎸 ' + p + '</span>').join('');
+  } else {
+    perfWrap.style.display = 'none';
+  }
+
+  // Additional (non-performer) guests
   const extrasWrap = document.getElementById('rev-extras-wrap');
   const extrasDiv  = document.getElementById('rev-extras');
-  if (extras.length) {
+  if (t.nonPerformerGuests.length) {
     extrasWrap.style.display = '';
-    extrasDiv.innerHTML = extras.map(g => '<span class="guest-pill">👤 ' + g + '</span>').join('');
+    extrasDiv.innerHTML = t.nonPerformerGuests.map(g => '<span class="guest-pill">👤 ' + g + '</span>').join('');
   } else {
     extrasWrap.style.display = 'none';
   }
+
   const foodHtml = optedOut
     ? '<span class="food-tag" style="background:#f3f0fa;color:#7a6e8a">🙅 Not bringing food</span>'
     : foods.map(f => '<span class="food-tag" style="display:inline-flex;margin:0.2rem 0">🍽️ ' + f.category + ' — ' + f.item + '</span>').join('<br>');
@@ -1184,8 +1319,7 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
   const btn    = document.getElementById('btn-submit');
   const name   = document.getElementById('main-name').value.trim();
   const email  = document.getElementById('main-email').value.trim();
-  const extras = [...document.querySelectorAll('.extra-guest')].map(i => i.value.trim()).filter(Boolean);
-  const total  = 1 + extras.length;
+  const t      = computeTotals();
   const foods  = collectFoods();
   const optedOut = foods.length === 1 && foods[0].category === OPTED_OUT;
   btn.textContent = '✨ Sending…';
@@ -1193,7 +1327,12 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
   const payload = {
     action: 'rsvp', date: EVENT_DATE, displayDate: DISPLAY_DATE,
     band: document.getElementById('band-sel').value,
-    name, email, guests: extras, totalCount: total,
+    name: name, email: email,
+    isMainPerformer: t.mainPerf,
+    guests: t.guests,
+    totalCount: t.totalGuests,
+    performerCount: t.performers.length,
+    amountOwed: t.amountOwed,
     foods: optedOut ? [{category: 'Not bringing food', item: '—'}] : foods
   };
   try {
@@ -1207,14 +1346,16 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     btn.disabled = false;
     return;
   }
-  const guestSummary = extras.length ? name + ' + ' + extras.join(', ') : name;
+  const allNames = [name].concat(t.guests.map(g => g.name));
+  const guestSummary = allNames.length > 1 ? allNames.join(', ') : name;
   const foodSummary  = optedOut ? 'Not bringing food'
     : foods.map(f => f.category + ': ' + f.item).join(' · ');
   document.getElementById('succ-night').textContent  = DISPLAY_DAY;
   document.getElementById('succ-band').textContent   = document.getElementById('band-sel').value;
   document.getElementById('succ-date').textContent   = DISPLAY_DATE;
-  document.getElementById('succ-guests').textContent = guestSummary;
-  document.getElementById('succ-cover').textContent  = total + ' × $5 — please pay Jennifer 1 week before the concert';
+  document.getElementById('succ-guests').textContent = guestSummary +
+    (t.performers.length ? '  (🎸 performing: ' + t.performers.join(', ') + ')' : '');
+  document.getElementById('succ-cover').textContent  = t.payingCount + ' × $5 = $' + t.amountOwed + ' — pay Jennifer by ' + PAYMENT_DEADLINE;
   document.getElementById('succ-food').textContent   = foodSummary;
   showStep(4);
 });
@@ -1277,13 +1418,21 @@ function hideEditBanner() {
 function prefillFromExisting(data) {
   document.getElementById('main-name').value = data.name || '';
   document.getElementById('band-sel').value = data.band || '';
+  document.getElementById('main-performer').checked = !!data.isMainPerformer;
 
   var guestList = document.getElementById('guest-list');
   guestList.innerHTML = '';
   (data.guests || []).forEach(function(g) {
     document.getElementById('add-guest-btn').click();
-    var inputs = guestList.querySelectorAll('.extra-guest');
-    inputs[inputs.length - 1].value = g;
+    var rows = guestList.querySelectorAll('.guest-row');
+    var lastRow = rows[rows.length - 1];
+    // Support both {name, isPerformer} objects and bare strings (legacy)
+    if (typeof g === 'string') {
+      lastRow.querySelector('.extra-guest').value = g;
+    } else {
+      lastRow.querySelector('.extra-guest').value = g.name || '';
+      lastRow.querySelector('.guest-performer-cb').checked = !!g.isPerformer;
+    }
   });
 
   window.__prefilledFoods    = data.foods || [];
