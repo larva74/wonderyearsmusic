@@ -356,7 +356,7 @@
       cursor: pointer;
       margin: 0;
       position: relative;
-      transition: all 0.12s;
+      touch-action: manipulation;
       flex-shrink: 0;
     }
     .perf-cb:checked {
@@ -628,7 +628,7 @@
     .remove-food-btn {
       background: none; border: none; color: var(--muted);
       cursor: pointer; font-size: 0.82rem; font-weight: 700;
-      padding: 0.2rem 0.5rem; border-radius: 6px; transition: all 0.12s;
+      padding: 0.2rem 0.5rem; border-radius: 6px; touch-action: manipulation;
     }
     .remove-food-btn:hover { background: #fce4ec; color: #c62828; }
     .food-entry .field { margin-bottom: 0.65rem; }
@@ -1044,10 +1044,12 @@ function loadTallyThenStep2() {
   var grid = document.getElementById('tally-grid');
   grid.innerHTML = '<div class="tally-loading">Checking the menu...</div>';
 
-  // Show food form immediately — do not wait for the network
-  document.getElementById('food-entries').innerHTML = '';
-  addFoodEntry();
-  applyPrefilledFoodsIfAny();
+  // Only initialize food form on first visit; preserve entries on subsequent visits
+  var foodContainer = document.getElementById('food-entries');
+  if (foodContainer.children.length === 0) {
+    addFoodEntry();
+    applyPrefilledFoodsIfAny();
+  }
 
   // Fetch tally in background; update dropdown + display when ready
   var settled = false;
@@ -1153,9 +1155,10 @@ function addFoodEntry() {
   refreshEntryLabels();
 }
 function fillCategorySelect(sel) {
+  var currentValue = sel.value;  // preserve selection across refreshes
   sel.innerHTML = '<option value="">— Choose a category —</option>';
   if (tallyData && tallyData.length) {
-    tallyData.filter(r => r.remaining > 0).forEach(r => {
+    tallyData.filter(r => r.remaining > 0 || r.category === currentValue).forEach(r => {
       const opt = document.createElement('option');
       opt.value = r.category;
       opt.textContent = r.category + '  (' + r.remaining + ' spot' + (r.remaining !== 1 ? 's' : '') + ' left)';
@@ -1175,6 +1178,7 @@ function fillCategorySelect(sel) {
   noFood.value = OPTED_OUT;
   noFood.textContent = 'We will not be partaking in the food — not bringing anything';
   sel.appendChild(noFood);
+  if (currentValue) sel.value = currentValue;  // restore previous selection
 }
 
 function handleCatChange(entry, val) {
