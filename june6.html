@@ -64,14 +64,15 @@
     }
 
     /* ── Background decorative notes ── */
-    .page-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .page-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; transform: translateZ(0); isolation: isolate; }
 
     /* Spotlight glows */
     .spotlight {
       position: absolute;
       border-radius: 50%;
-      filter: blur(80px);
+      filter: blur(40px);
       animation: spotPulse 12s infinite ease-in-out;
+      will-change: transform, opacity;
     }
     @keyframes spotPulse {
       0%,100% { transform: scale(1);    opacity: 1; }
@@ -84,6 +85,7 @@
       opacity: 0;
       animation: floatNote 16s infinite ease-in-out;
       filter: drop-shadow(0 0 8px currentColor);
+      will-change: transform, opacity;
     }
     @keyframes floatNote {
       0%   { opacity: 0;    transform: translateY(0px)   rotate(-10deg) scale(0.9); }
@@ -100,6 +102,7 @@
       height: 2px;
       border-radius: 2px;
       animation: driftStaff 28s infinite ease-in-out;
+      will-change: transform;
     }
     @keyframes driftStaff {
       0%   { transform: translateX(-4%) skewX(-2deg); }
@@ -112,6 +115,7 @@
       position: absolute;
       animation: bgNotePulse 20s infinite ease-in-out;
       fill: #ffd400;
+      will-change: transform, opacity;
     }
     @keyframes bgNotePulse {
       0%, 100% { transform: scale(1)    rotate(-6deg); opacity: 1; }
